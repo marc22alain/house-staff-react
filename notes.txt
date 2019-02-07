@@ -1,0 +1,8 @@
+Application purposes:
+- provide simple dashboard for current stats
+- provide tools to extend data analysis
+- provide controls for manipulating devices
+
+TO EXPLORE:
+- https://reactjs.org/docs/error-boundaries.html
+  . handle errors
