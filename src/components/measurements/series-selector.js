@@ -30,7 +30,7 @@ class SeriesSelector extends Component {
   }
 
   callItemCallback(event) {
-    this.state.callback(event.target);
+    this.state.callback(event.target.textContent);
   }
 }
 

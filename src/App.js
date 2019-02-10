@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import MeasExplorer from './components/measurements/meas-explorer.js';
 import Dashboard from './controllers/dashboard.js';
 
 class App extends Component {
@@ -23,7 +22,6 @@ class App extends Component {
             Learn React
           </a>
         </header>
-        <MeasExplorer />
         <Dashboard />
       </div>
     );
