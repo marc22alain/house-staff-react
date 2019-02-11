@@ -1,65 +1,92 @@
 import React, { Component } from 'react';
 import SeriesSelector from '../components/measurements/series-selector.js';
 import PlotlyChart from '../components/plotly-chart.js';
-import { fetchMeasurements, fetchSeries, fetchTimeseries, fetchSeriesAndKeys } from '../services/influx-service.js';
+import StatusBadge from '../components/status-badge.js';
+import { fetchDBcatalog } from '../services/influx-service.js';
 
-// TODO: consider how best to abstract this: 
-//  http://192.168.2.31:8086/query?db=mydb&q=SHOW SERIES %3B SHOW MEASUREMENTS %3B SHOW FIELD KEYS FROM environment
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
 
+    // Trim when the series-selector is fully wired in.
     this.state = {
-      tiles: [{number:55}]
+      tiles: [{
+        queryOptions: {
+          measurement: 'environment',
+          tags: [{
+              key: 'locale',
+              value: 'plant'
+            },{
+              key: 'plant',
+              value: 'orchid'
+            },{
+              key: 'sensor_id',
+              value: 'CDS#001'
+            }
+          ],
+          fields: ['light'],
+          timeRange: {
+            start: '3-weeks-ago',
+            end: 'now'
+          }
+        }
+      }],
+      badges: []
     };
+  }
 
-    // TODO: move this to componentDidMount()
-    fetchSeriesAndKeys()
-      .then((seriesResponse) => {
-        this.setState(() => {
-          return {series: seriesResponse.values};
-        })
+  componentDidMount() {
+    fetchDBcatalog()
+      .then((catalog) => {
+        this.setState({ dbCatalog: catalog });
       });
   }
 
   render() {
     let callback = this.instantiateNewDashboardTile.bind(this);
-    if (!this.state.series) {
-      return <div><SeriesSelector
-                values={null}
-                callback={callback}
-              />
-              <PlotlyChart />
-             {this.state.tiles.map((tile) => {
-                return <h1 key={tile.number.toString()}>{tile.number}</h1>
-              })} </div>;
+    if (!this.state.dbCatalog) {
+      return null;
     } else {
       // TODO: add the TileManager
-      return <div><SeriesSelector
-              values={this.state.series}
-              callback={callback}
-            />
-              <PlotlyChart />
-             {this.state.tiles.map((tile) => {
-                return <h1 key={tile.number.toString()}>{tile.number}</h1>
-              })} </div>;
+      return <div>
+              <SeriesSelector
+                catalog={this.state.dbCatalog}
+                callback={callback}
+              />
+              <div>
+                {this.state.badges.map((tile, index) => {
+                  return  <StatusBadge 
+                            key={index.toString()}
+                            queryOptions={tile.queryOptions}
+                          />
+                })}
+              </div>
+              <div>
+                {this.state.tiles.map((tile, index) => {
+                  return  <PlotlyChart 
+                            key={index.toString()}
+                            queryOptions={tile.queryOptions}
+                          />
+                })}
+              </div>
+            </div>;
     }
   }
 
   instantiateNewDashboardTile(options) {
-    // example: "environment,locale=plant,plant=orchid,sensor_id=CDS#001"
     console.log('instantiateNewDashboardTile', options);
-    this.setState((state) => {
-      console.log('instantiateNewDashboardTile state', state);
-      let randomNum = Math.floor(Math.random() * 10);
-      console.log('randomNum', randomNum);
-      state.tiles.push({ number: randomNum })
-      return { tiles: state.tiles }
-    });
-    // TODO: update state for TileManager, adding a new Tile.
-    fetchTimeseries({ seriesQuery: options })
-      .then((data) => console.log('Dashboard got',data));
+    if (options.queryOptions.timespan !== 'now') {
+      this.setState((state) => {
+        state.tiles.push(options)
+        return { tiles: state.tiles }
+      });      
+    } else {
+      this.setState((state) => {
+        state.badges.push(options)
+        return { badges: state.badges }
+      });      
+    }
   }
 }
 
