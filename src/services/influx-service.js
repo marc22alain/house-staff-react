@@ -120,7 +120,6 @@ function fetchLatestInSeries(options) {
         stuff.columns = data.results[0].series[0].columns;
         stuff.values = data.results[0].series[0].values;
       } 
-      console.log('fetchLatestInSeries', stuff);
       return stuff;
     });
 }
@@ -158,7 +157,7 @@ function _formQuery(options) {
       return `${key}='${escape(tag[key])}'`;
     }).join(' AND ');
   }
-  console.log('_formQuery', `SELECT ${fields} FROM ${measurement} WHERE ${tags}`)
+  console.log('_formQuery', `SELECT ${fields} FROM ${measurement} WHERE ${tags}`);
   return `SELECT ${fields} FROM ${measurement} WHERE ${tags}`;
 }
 

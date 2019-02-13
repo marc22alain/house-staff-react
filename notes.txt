@@ -6,3 +6,8 @@ Application purposes:
 TO EXPLORE:
 - https://reactjs.org/docs/error-boundaries.html
   . handle errors
+
+
+Project dependencies:
+- https://github.com/FortAwesome/react-fontawesome
+  . https://fontawesome.com/icons?d=gallery

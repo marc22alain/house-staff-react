@@ -6,34 +6,49 @@ import { fetchDBcatalog } from '../services/influx-service.js';
 
 
 class Dashboard extends Component {
+  localStorageStateKey = 'dashboard-tiles-badges'
+
   constructor(props) {
     super(props);
 
+    let storedState = window.localStorage.getItem(this.localStorageStateKey);
+
+    if (storedState) {
+      this.state = JSON.parse(storedState);
+      console.log('restored state', this.state);
+    } else {
+      this.state = {
+        tiles: [],
+        badges: []
+      };
+    }
+
+
     // Trim when the series-selector is fully wired in.
-    this.state = {
-      tiles: [{
-        queryOptions: {
-          measurement: 'environment',
-          tags: [{
-              key: 'locale',
-              value: 'plant'
-            },{
-              key: 'plant',
-              value: 'orchid'
-            },{
-              key: 'sensor_id',
-              value: 'CDS#001'
-            }
-          ],
-          fields: ['light'],
-          timeRange: {
-            start: '3-weeks-ago',
-            end: 'now'
-          }
-        }
-      }],
-      badges: []
-    };
+  //   this.state = {
+  //     tiles: [{
+  //       queryOptions: {
+  //         measurement: 'environment',
+  //         tags: [{
+  //             key: 'locale',
+  //             value: 'plant'
+  //           },{
+  //             key: 'plant',
+  //             value: 'orchid'
+  //           },{
+  //             key: 'sensor_id',
+  //             value: 'CDS#001'
+  //           }
+  //         ],
+  //         fields: ['light'],
+  //         timeRange: {
+  //           start: '3-weeks-ago',
+  //           end: 'now'
+  //         }
+  //       }
+  //     }],
+  //     badges: []
+  //   };
   }
 
   componentDidMount() {
@@ -62,7 +77,7 @@ class Dashboard extends Component {
                           />
                 })}
               </div>
-              <div>
+              <div flex justify-center>
                 {this.state.tiles.map((tile, index) => {
                   return  <PlotlyChart 
                             key={index.toString()}
@@ -80,13 +95,17 @@ class Dashboard extends Component {
       this.setState((state) => {
         state.tiles.push(options)
         return { tiles: state.tiles }
-      });      
+      }, this.saveState.bind(this));      
     } else {
       this.setState((state) => {
         state.badges.push(options)
         return { badges: state.badges }
-      });      
+      }, this.saveState.bind(this));      
     }
+  }
+
+  saveState() {
+    window.localStorage.setItem(this.localStorageStateKey, JSON.stringify(this.state));
   }
 }
 
