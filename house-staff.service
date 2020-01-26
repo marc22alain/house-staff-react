@@ -1,0 +1,12 @@
+[Unit]
+Description=House Staff web app
+After=network.service
+
+[Service]
+WorkingDirectory=/home/pi/House-Staff/house-staff-react
+ExecStart=/home/pi/.yarn/bin/serve -s build
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
