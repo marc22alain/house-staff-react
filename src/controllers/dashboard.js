@@ -3,19 +3,18 @@ import SeriesSelector from '../components/measurements/series-selector.js';
 import PlotlyChart from '../components/plotly-chart.js';
 import StatusBadge from '../components/status-badge.js';
 import { fetchDBcatalog } from '../services/influx-service.js';
+import { fetchConfig, saveConfig } from '../services/config-service.js';
+import _ from 'lodash';
 
 
 class Dashboard extends Component {
-  localStorageStateKey = 'dashboard-tiles-badges'
-
   constructor(props) {
     super(props);
 
-    let storedState = window.localStorage.getItem(this.localStorageStateKey);
+    let storedState = fetchConfig();
 
     if (storedState) {
-      this.state = JSON.parse(storedState);
-      console.log('restored state', this.state);
+      this.state = storedState;
     } else {
       this.state = {
         tiles: [],
@@ -74,6 +73,9 @@ class Dashboard extends Component {
                   return  <StatusBadge 
                             key={index.toString()}
                             queryOptions={tile.queryOptions}
+                            // remove={this.removeTile.bind(this)}
+                            remove={this.removeBadge.bind(this)}
+                            update={() => {}}
                           />
                 })}
               </div>
@@ -82,6 +84,8 @@ class Dashboard extends Component {
                   return  <PlotlyChart 
                             key={index.toString()}
                             queryOptions={tile.queryOptions}
+                            remove={this.removeTile}
+                            update={() => {}}
                           />
                 })}
               </div>
@@ -105,7 +109,17 @@ class Dashboard extends Component {
   }
 
   saveState() {
-    window.localStorage.setItem(this.localStorageStateKey, JSON.stringify(this.state));
+    saveConfig(this.state);
+  }
+
+  removeBadge(up) {
+    const badgesCopy = this.state.badges
+    const i = badgesCopy.findIndex(badge => {
+      return _.isEqual(up.props.queryOptions, badge.queryOptions);
+    });
+    badgesCopy.splice(i,1);
+    this.setState({badges: badgesCopy});
+    saveConfig(this.state);
   }
 }
 

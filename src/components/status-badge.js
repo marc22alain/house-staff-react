@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSync } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faSync } from '@fortawesome/free-solid-svg-icons'
 import { fetchLatestInSeries } from '../services/influx-service.js';
 
 class StatusBadge extends Component {
@@ -12,9 +12,16 @@ class StatusBadge extends Component {
 
   render() {
     const { jsonData } = this.state;
+
     if (!jsonData) {
       return null;
     }
+
+    if (!jsonData.values) {
+      // exposes a bad plot/badge
+      jsonData.values = [[]];
+    }
+
     let field = this.props.queryOptions.fields[0];
     let title = capitalize(field);
     let time = (new Date(jsonData.values[0][0])).toLocaleTimeString();
@@ -30,6 +37,11 @@ class StatusBadge extends Component {
           className="text-blue align-top m-1" 
           onClick={this.load.bind(this)}
         />
+        <FontAwesomeIcon 
+          icon={faTrash} 
+          className="text-blue align-top m-1" 
+          onClick={this.removeBadge.bind(this)}
+        />
       </div>
     )
   }
@@ -39,6 +51,15 @@ class StatusBadge extends Component {
       .then((data) => {
         this.setState({ jsonData: data });
       });
+  }
+
+  removeBadge() {
+    this.props.remove(this);
+  }
+
+  update() {
+    // actually does nothing yet
+    this.props.update();
   }
 }
 

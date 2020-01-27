@@ -43,7 +43,7 @@ class SeriesSelector extends Component {
         <select id="series" onChange={this.selectCallback.bind(this)}>
           <option value="">Select a series</option>
           {seriesOptions.map((series, seriesIndex) => {
-            let description = series.tags.map((tag) => `${tag.key}=${tag.value}`).join();
+            let description = series.tags.map((tag) => tag.value).join();
             return <option key={description} value={seriesIndex.toString()}>{description}</option>
             })
           }
@@ -53,6 +53,7 @@ class SeriesSelector extends Component {
       return null;
     }
   }
+
 
   addFieldOptions() {
     if (this.state.selectedSeries) {

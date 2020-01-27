@@ -11,3 +11,18 @@ TO EXPLORE:
 Project dependencies:
 - https://github.com/FortAwesome/react-fontawesome
   . https://fontawesome.com/icons?d=gallery
+
+
+
+BUGS
+- double-bug:
+  . UI mistake
+  . non-existent sanity check for array
+  - all fields show, without regard to which sensor serves them
+  - got:
+    TypeError: "e.values is null"
+      value status-badge.js:20
+
+LEARN and IMPLEMENT
+- error boundaries, to catch errors that occur in a component, and catch to avoid breaking the whole app
+	https://reactjs.org/docs/error-boundaries.html
